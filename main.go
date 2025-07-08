@@ -16,21 +16,41 @@ type User struct {
 
 var DB *gorm.DB
 
+// func ConnectDB() {
+// 	dsn := "root:@tcp(127.0.0.1:3306)/go_test?charset=utf8mb4&parseTime=True&loc=Local"
+// 	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+// 	if err != nil {
+// 		log.Fatal("Database connection failed: ", err)
+// 	}
+
+// 	database.AutoMigrate(&User{})
+// 	DB = database
+// }
+
+// Database connect function
 func ConnectDB() {
-	dsn := "root:@tcp(127.0.0.1:3306)/go_test?charset=utf8mb4&parseTime=True&loc=Local"
-	database, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	dsn := "root:JsoEoUbmoVdbjVpeWOAyJUQTKAoPymTU@tcp(mainline.proxy.rlwy.net:42773)/railway?parseTime=true"
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("Database connection failed: ", err)
 	}
 
-	database.AutoMigrate(&User{})
-	DB = database
+	// Auto migrate model
+	db.AutoMigrate(&User{})
+
+	DB = db
+	log.Println("Connected to MySQL successfully!")
 }
 
 func main() {
 	app := fiber.New()
 
 	ConnectDB()
+
+	// Root endpoint
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("🚀 Go Fiber App with Railway MySQL is running!")
+	})
 
 	app.Get("/users", func(c *fiber.Ctx) error {
 		var users []User
